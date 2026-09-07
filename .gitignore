@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL support
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# dbt
+dbt_packages/
+logs/
+target/
+
+# Unit test / coverage reports
+.pytest_cache/
+.pytest_cache
+.coverage
+htmlcov/
+
+# IDEs and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
