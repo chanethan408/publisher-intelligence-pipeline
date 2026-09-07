@@ -1,9 +1,26 @@
+# YouTube Data API v3 Client
 google-api-python-client==2.118.0
+
+# AWS S3 Storage
 boto3==1.34.44
 botocore==1.34.44
+
+# Environment Variables & Resilient Execution
 python-dotenv==1.0.1
 tenacity==8.2.3
+
+# Snowflake Data Warehouse & Python Connector
+snowflake-connector-python==3.7.0
+
+# dbt Transformation Engine for Snowflake
+dbt-core==1.7.9
+dbt-snowflake==1.7.1
+
+# Testing & Mocking Framework
 pytest==8.0.0
 pytest-mock==3.12.0
+moto[s3]==5.0.1
+
+# Code Formatting & Linting (CI/CD)
 black==24.2.0
 flake8==7.0.0
