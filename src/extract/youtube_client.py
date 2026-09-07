@@ -1,3 +1,5 @@
+"""YouTube Data API v3 client using uploads playlist pagination and batch hydration."""
+
 from datetime import datetime, timezone
 from typing import Any, Dict, Generator, List, Optional
 from googleapiclient.discovery import Resource, build
@@ -8,6 +10,7 @@ from tenacity import (
     stop_after_attempt,
     wait_exponential,
 )
+
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -45,10 +48,7 @@ class YouTubeExtractor:
 
             return items[0]["contentDetails"]["relatedPlaylists"]["uploads"]
         except HttpError as exc:
-            logger.error(
-                f"Failed to retrieve uploads playlist for channel: {channel_id}",
-                extra={"extra_payload": {"error": str(exc)}},
-            )
+            logger.error(f"Failed to retrieve uploads playlist for channel: {channel_id}: {exc}")
             raise
 
     @retry(
@@ -145,6 +145,7 @@ class YouTubeExtractor:
                 "comment_count": int(stats.get("commentCount", 0)),
                 "topic_categories": topic_details.get("topicCategories", []),
                 "snapshot_date": snapshot_date,
+                "extracted_at": datetime.now(timezone.utc).isoformat(),
             }
             extracted_records.append(record)
 

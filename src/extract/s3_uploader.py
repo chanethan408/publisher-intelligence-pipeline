@@ -1,49 +1,93 @@
-import gzip
-import json
+"""AWS S3 raw storage client for immutable compressed JSON telemetry."""
+
 from datetime import datetime, timezone
+import gzip
+import io
+import json
+import time
 from typing import Any, Dict, List, Optional
 import boto3
 from botocore.exceptions import ClientError
+
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
 class S3UploadError(Exception):
-    """Raised when writing to S3 fails."""
+    """Raised when an S3 upload fails or violates immutability."""
 
 
 class S3RawStorage:
-    """Manages raw, immutable data deposits into AWS S3."""
+    """Manages immutable raw JSON.GZ uploads to S3 partitions."""
 
-    def __init__(self, bucket_name: str, client: Optional[Any] = None):
+    def __init__(
+        self,
+        bucket_name: str,
+        aws_access_key_id: Optional[str] = None,
+        aws_secret_access_key: Optional[str] = None,
+        region_name: str = "us-east-1",
+        client: Optional[Any] = None,
+    ):
         self.bucket_name = bucket_name
-        self.s3_client = client or boto3.client("s3")
+
+        if client is not None:
+            self.s3_client = client
+        else:
+            client_kwargs: Dict[str, Any] = {"region_name": region_name}
+            if aws_access_key_id and aws_secret_access_key:
+                client_kwargs["aws_access_key_id"] = aws_access_key_id
+                client_kwargs["aws_secret_access_key"] = aws_secret_access_key
+            self.s3_client = boto3.client("s3", **client_kwargs)
 
     @staticmethod
-    def generate_s3_key(execution_date: str, timestamp_epoch: int) -> str:
-        """Constructs partitioned target path."""
-        return (
-            f"raw/entity=videos/date={execution_date}/"
-            f"payload_{timestamp_epoch}.json.gz"
-        )
+    def generate_s3_key(
+        execution_date: str, timestamp: Optional[int] = None, entity: str = "videos"
+    ) -> str:
+        """Constructs an immutable Hive-partitioned S3 key."""
+        ts = timestamp if timestamp is not None else int(time.time())
+        return f"raw/entity={entity}/date={execution_date}/payload_{ts}.json.gz"
 
     def upload_raw_payload(
         self,
-        payload_records: List[Dict[str, Any]],
+        records: List[Dict[str, Any]],
         execution_date: str,
+        entity: str = "videos",
     ) -> Dict[str, Any]:
-        """Compresses payload in-memory and writes object directly to S3."""
-        if not payload_records:
-            logger.warning("Zero records provided for upload. Aborting S3 write.")
-            return {"uploaded": False, "records": 0, "s3_uri": None}
+        """Compresses records to JSON.GZ and uploads them to S3 immutably."""
+        if not records:
+            logger.warning(
+                "Payload is empty; skipping upload",
+                extra={"extra_payload": {"execution_date": execution_date}},
+            )
+            return {"uploaded": False, "records": 0, "s3_uri": ""}
 
-        timestamp_epoch = int(datetime.now(timezone.utc).timestamp())
-        s3_key = self.generate_s3_key(execution_date, timestamp_epoch)
-        s3_uri = f"s3://{self.bucket_name}/{s3_key}"
+        s3_key = self.generate_s3_key(execution_date=execution_date, entity=entity)
 
-        serialized_json = json.dumps(payload_records, ensure_ascii=False)
-        compressed_bytes = gzip.compress(serialized_json.encode("utf-8"))
+        # Invariant check: enforce immutability
+        try:
+            self.s3_client.head_object(Bucket=self.bucket_name, Key=s3_key)
+            raise S3UploadError(
+                f"Object s3://{self.bucket_name}/{s3_key} already exists. Overwrites prohibited."
+            )
+        except ClientError as exc:
+            error_code = exc.response.get("Error", {}).get("Code")
+            # 404/NoSuchKey confirms the key is new and safe to write
+            if error_code not in ("404", "NoSuchKey"):
+                logger.error(
+                    "S3 head_object pre-check failed",
+                    extra={"extra_payload": {"error": str(exc)}},
+                )
+                raise
+
+        # Compress to in-memory buffer
+        buffer = io.BytesIO()
+        with gzip.GzipFile(fileobj=buffer, mode="wb") as gz:
+            json_bytes = json.dumps(records, default=str).encode("utf-8")
+            gz.write(json_bytes)
+
+        buffer.seek(0)
+        compressed_bytes = buffer.getvalue()
 
         try:
             self.s3_client.put_object(
@@ -52,24 +96,32 @@ class S3RawStorage:
                 Body=compressed_bytes,
                 ContentType="application/json",
                 ContentEncoding="gzip",
+                Metadata={
+                    "records_count": str(len(records)),
+                    "execution_date": execution_date,
+                    "uploaded_at": datetime.now(timezone.utc).isoformat(),
+                },
             )
-
-            metadata = {
+            s3_uri = f"s3://{self.bucket_name}/{s3_key}"
+            logger.info(
+                "S3 payload upload successful",
+                extra={
+                    "extra_payload": {
+                        "s3_uri": s3_uri,
+                        "records_count": len(records),
+                        "bytes_uploaded": len(compressed_bytes),
+                    }
+                },
+            )
+            return {
                 "uploaded": True,
-                "records_count": len(payload_records),
+                "records_count": len(records),
                 "bytes_uploaded": len(compressed_bytes),
                 "s3_uri": s3_uri,
-                "s3_key": s3_key,
-                "execution_date": execution_date,
             }
-            logger.info(
-                "Raw payload uploaded successfully to S3",
-                extra={"extra_payload": metadata},
-            )
-            return metadata
-        except ClientError as exc:
+        except Exception as exc:
             logger.error(
-                "AWS ClientError encountered during S3 put_object",
-                extra={"extra_payload": {"error": str(exc), "target": s3_uri}},
+                "Failed to put object to S3",
+                extra={"extra_payload": {"s3_key": s3_key, "error": str(exc)}},
             )
-            raise S3UploadError(f"Failed to upload data to {s3_uri}") from exc
+            raise S3UploadError(str(exc)) from exc

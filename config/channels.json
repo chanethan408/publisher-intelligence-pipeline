@@ -1,0 +1,14 @@
+{
+  "channels": [
+    {
+      "channel_id": "UC_x5XG1OV2P6uZZ5FSM9Ttw",
+      "name": "Google Cloud Tech",
+      "topic": "cloud_engineering"
+    },
+    {
+      "channel_id": "UCsBjURrPoezykLs9EqgamOA",
+      "name": "Fireship",
+      "topic": "software_engineering"
+    }
+  ]
+}
