@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: raw_ingest
+    database: PUBLISHER_DWH
+    schema: RAW_INGEST
+    tables:
+      - name: raw_videos
+        description: "Raw immutable video payloads ingested from S3 via stage_snowflake.py"
+        columns:
+          - name: raw_payload
+            description: "Variant column containing raw YouTube video telemetry JSON object"
+          - name: execution_date
+            description: "Logical pipeline execution date derived from S3 partition prefix"
+          - name: ingested_at
+            description: "Timestamp when the record was copied into Snowflake"
+          - name: source_file
+            description: "Source S3 URI of the ingested archive"
