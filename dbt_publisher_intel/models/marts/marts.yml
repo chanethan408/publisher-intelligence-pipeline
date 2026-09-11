@@ -8,9 +8,10 @@ sources:
       - name: raw_videos
         description: "Raw immutable video payloads ingested from S3 via stage_snowflake.py"
         loaded_at_field: ingested_at
-        freshness:
-          warn_after: {count: 24, period: hour}
-          error_after: {count: 48, period: hour}
+        config:
+          freshness:
+            warn_after: {count: 24, period: hour}
+            error_after: {count: 48, period: hour}
         columns:
           - name: raw_payload
             description: "Variant column containing raw YouTube video telemetry JSON object"
