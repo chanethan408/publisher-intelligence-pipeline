@@ -6,7 +6,7 @@
 
 with video_metrics as (
 
-    select * 
+    select *
     from {{ ref('int_daily_video_metrics') }}
 
 ),

@@ -66,7 +66,11 @@ def test_fetch_video_batch_details(mock_extractor):
                     "description": "Building ELT",
                     "publishedAt": "2026-09-01T12:00:00Z",
                 },
-                "statistics": {"viewCount": "100", "likeCount": "10", "commentCount": "2"},
+                "statistics": {
+                    "viewCount": "100",
+                    "likeCount": "10",
+                    "commentCount": "2",
+                },
                 "topicDetails": {"topicCategories": []},
             }
         ]

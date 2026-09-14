@@ -48,7 +48,9 @@ class YouTubeExtractor:
 
             return items[0]["contentDetails"]["relatedPlaylists"]["uploads"]
         except HttpError as exc:
-            logger.error(f"Failed to retrieve uploads playlist for channel: {channel_id}: {exc}")
+            logger.error(
+                f"Failed to retrieve uploads playlist for channel: {channel_id}: {exc}"
+            )
             raise
 
     @retry(

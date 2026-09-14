@@ -14,7 +14,10 @@ def test_upload_raw_payload_success():
     mock_s3 = MagicMock()
     mock_s3.head_object.side_effect = Exception("404")  # Simulate file doesn't exist
     from botocore.exceptions import ClientError
-    mock_s3.head_object.side_effect = ClientError({"Error": {"Code": "404"}}, "head_object")
+
+    mock_s3.head_object.side_effect = ClientError(
+        {"Error": {"Code": "404"}}, "head_object"
+    )
 
     storage = S3RawStorage(bucket_name="test-bucket", client=mock_s3)
     sample_records = [{"video_id": "v1", "views": 100}]

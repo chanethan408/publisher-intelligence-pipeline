@@ -21,18 +21,18 @@ extracted_fields as (
         -- Identifiers
         raw_payload:video_id::string as video_id,
         raw_payload:channel_id::string as channel_id,
-        
+
         -- Descriptive Attributes
         raw_payload:title::string as video_title,
         raw_payload:channel_title::string as channel_title,
         raw_payload:description::string as video_description,
         raw_payload:published_at::timestamp_ntz as published_at,
-        
+
         -- Telemetry Metrics
         coalesce(raw_payload:view_count::integer, 0) as view_count,
         coalesce(raw_payload:like_count::integer, 0) as like_count,
         coalesce(raw_payload:comment_count::integer, 0) as comment_count,
-        
+
         -- Semi-structured Topic Categories
         raw_payload:topic_categories as topic_categories,
 
@@ -50,9 +50,9 @@ deduplicated as (
 
     select *
     from extracted_fields
-    -- Invariant: strictly 1 row per video per snapshot date, preserving latest ingest
+    -- Invariant: 1 row per video and snapshot date, keeping latest ingest
     qualify row_number() over (
-        partition by video_id, snapshot_date 
+        partition by video_id, snapshot_date
         order by ingested_at desc
     ) = 1
 

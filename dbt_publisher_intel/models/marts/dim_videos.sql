@@ -6,7 +6,7 @@
 
 with video_metrics as (
 
-    select * 
+    select *
     from {{ ref('int_daily_video_metrics') }}
 
 ),
@@ -21,7 +21,7 @@ deduplicated_videos as (
         snapshot_date as metadata_last_updated_date
     from video_metrics
     qualify row_number() over (
-        partition by video_id 
+        partition by video_id
         order by snapshot_date desc
     ) = 1
 

@@ -49,14 +49,12 @@ class SnowflakeStageLoader:
             if key_path and Path(key_path).exists():
                 with open(key_path, "rb") as kf:
                     p_key = serialization.load_pem_private_key(
-                        kf.read(),
-                        password=None,
-                        backend=default_backend()
+                        kf.read(), password=None, backend=default_backend()
                     )
                 self.conn_params["private_key"] = p_key.private_bytes(
                     encoding=serialization.Encoding.DER,
                     format=serialization.PrivateFormat.PKCS8,
-                    encryption_algorithm=serialization.NoEncryption()
+                    encryption_algorithm=serialization.NoEncryption(),
                 )
             else:
                 self.conn_params["password"] = os.getenv("SNOWFLAKE_PASSWORD")
@@ -114,12 +112,19 @@ class SnowflakeStageLoader:
                         "rows_loaded": rows_loaded,
                         "status": "SUCCESS",
                     }
-                    logger.info("Snowflake staging complete", extra={"extra_payload": summary})
+                    logger.info(
+                        "Snowflake staging complete", extra={"extra_payload": summary}
+                    )
                     return summary
         except DatabaseError as err:
             logger.error(
                 "Snowflake COPY INTO failed",
-                extra={"extra_payload": {"execution_date": execution_date, "error": str(err)}},
+                extra={
+                    "extra_payload": {
+                        "execution_date": execution_date,
+                        "error": str(err),
+                    }
+                },
             )
             raise
 

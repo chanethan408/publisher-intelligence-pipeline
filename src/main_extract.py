@@ -27,6 +27,7 @@ load_dotenv()
 
 logger = get_logger("main_extract")
 
+
 def parse_args() -> argparse.Namespace:
     """Parses command-line execution parameters."""
     parser = argparse.ArgumentParser(
@@ -95,7 +96,12 @@ def run_pipeline(execution_date: str, config_path: str) -> Dict[str, Any]:
 
             logger.info(
                 f"Discovered {len(video_ids)} video IDs for channel: {channel_name}",
-                extra={"extra_payload": {"channel_id": channel_id, "video_count": len(video_ids)}},
+                extra={
+                    "extra_payload": {
+                        "channel_id": channel_id,
+                        "video_count": len(video_ids),
+                    }
+                },
             )
 
             # Hydrate in 50-video chunks
@@ -128,7 +134,9 @@ def run_pipeline(execution_date: str, config_path: str) -> Dict[str, Any]:
         "status": "SUCCESS",
     }
 
-    logger.info("Extraction pipeline finished successfully", extra={"extra_payload": summary})
+    logger.info(
+        "Extraction pipeline finished successfully", extra={"extra_payload": summary}
+    )
     return summary
 
 
