@@ -14,6 +14,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+# Define deterministic fallback path for channels configuration
+DEFAULT_CONFIG_PATH = PROJECT_ROOT / "config" / "channels.json"
+
 from dotenv import load_dotenv
 
 from src.extract.s3_uploader import S3RawStorage
@@ -38,7 +41,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--config-path",
         type=str,
-        default="config/channels.json",
+        default=str(DEFAULT_CONFIG_PATH),
         help="Path to curated channels JSON file.",
     )
     return parser.parse_args()

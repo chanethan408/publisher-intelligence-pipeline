@@ -6,23 +6,33 @@ __pycache__/
 # C extensions
 *.so
 
-# Environments
+# Environments & Local Secrets
 .env
-.venv
+.env.*
+!.env.example
+.venv/
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
 
-# dbt
+# dbt Artifacts & Credentials
 dbt_packages/
 logs/
 target/
+dbt_publisher_intel/profiles.yml
+dbt_publisher_intel/.user.yml
+.user.yml
+
+# Cryptographic Keys
+*.p8
+*.pem
+*.key
+snowflake_key.pub
 
 # Unit test / coverage reports
 .pytest_cache/
-.pytest_cache
 .coverage
 htmlcov/
 
@@ -31,11 +41,3 @@ htmlcov/
 .vscode/
 .DS_Store
 Thumbs.db
-
-snowflake_key.p8
-
-snowflake_key.p8
-
-snowflake_key.p8
-
-snowflake_key.pub

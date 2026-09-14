@@ -1,23 +1,32 @@
 version: 2
 
-sources:
-  - name: raw_ingest
-    database: PUBLISHER_DWH
-    schema: RAW_INGEST
-    tables:
-      - name: raw_videos
-        description: "Raw immutable video payloads ingested from S3 via stage_snowflake.py"
-        loaded_at_field: ingested_at
-        config:
-          freshness:
-            warn_after: {count: 24, period: hour}
-            error_after: {count: 48, period: hour}
-        columns:
-          - name: raw_payload
-            description: "Variant column containing raw YouTube video telemetry JSON object"
-          - name: execution_date
-            description: "Logical pipeline execution date derived from S3 partition prefix"
-          - name: ingested_at
-            description: "Timestamp when the record was copied into Snowflake"
-          - name: source_file
-            description: "Source S3 URI of the ingested archive"
+models:
+  - name: fct_daily_video_performance
+    description: "Daily snapshot performance telemetry at (video_id, snapshot_date) grain."
+    columns:
+      - name: performance_pk
+        description: "Deterministic surrogate key: MD5(video_id || snapshot_date)."
+        tests:
+          - unique
+          - not_null
+
+      - name: video_id
+        description: "Foreign key referencing dim_videos."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_videos')
+              field: video_id
+
+      - name: channel_id
+        description: "Foreign key referencing dim_channels."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_channels')
+              field: channel_id
+
+      - name: snapshot_date
+        description: "Date of the snapshot pull."
+        tests:
+          - not_null
