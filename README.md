@@ -15,11 +15,11 @@ An automated, end-to-end ELT data pipeline engineered to collect digital publish
 
 ```mermaid
 flowchart LR
-    subgraph Ingestion [Extraction & Raw Landing]
+    subgraph SG_Ingestion [Extraction & Raw Landing]
         A[YouTube Data API v3] -->|Python Extractor| B[(Amazon S3 Raw Lake)]
     end
 
-    subgraph DWH [Snowflake Cloud DWH]
+    subgraph SG_DWH [Snowflake Cloud DWH]
         B -->|External Stage / COPY INTO| C[(RAW_INGEST.RAW_VIDEOS)]
         C -->|dbt View| D[STAGING.stg_youtube__videos]
         D -->|dbt View| E[INTERMEDIATE.int_daily_video_metrics]
@@ -28,11 +28,10 @@ flowchart LR
         E -->|dbt Incremental Merge| H[MARTS.FCT_DAILY_VIDEO_PERFORMANCE]
     end
 
-    subgraph Orchestration [Orchestration & Verification]
-        I[Dockerized Apache Airflow] -.->|Extract / Stage / Transform / Test| DWH
-        J[GitHub Actions CI] -.->|Black / Flake8 / SQLFluff / dbt Parse| Orchestration
+    subgraph SG_Orchestration [Orchestration & Verification]
+        I[Dockerized Apache Airflow] -.->|Extract / Stage / Transform / Test| C
+        J[GitHub Actions CI] -.->|Black / Flake8 / SQLFluff / dbt Parse| I
     end
-```
 
 ---
 
