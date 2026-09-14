@@ -37,7 +37,7 @@ jobs:
         run: |
           sqlfluff lint dbt_publisher_intel/models --dialect snowflake
 
-dbt-validation:
+  dbt-validation:
     name: dbt Project Validation
     runs-on: ubuntu-latest
     steps:
