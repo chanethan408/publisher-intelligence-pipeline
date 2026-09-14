@@ -1,8 +1,6 @@
 """Unit tests for Snowflake staging loader using mocked Snowflake connector."""
 
 from unittest.mock import MagicMock, patch
-import pytest
-
 from src.load.stage_snowflake import SnowflakeStageLoader
 
 

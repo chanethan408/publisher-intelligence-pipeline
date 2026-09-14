@@ -8,7 +8,7 @@ from src.extract.youtube_client import YouTubeExtractor, YouTubeExtractionError
 
 @pytest.fixture
 def mock_extractor():
-    with patch("src.extract.youtube_client.build") as mock_build:
+    with patch("src.extract.youtube_client.build"):
         extractor = YouTubeExtractor(api_key="test_key")
         yield extractor, extractor.service
 
