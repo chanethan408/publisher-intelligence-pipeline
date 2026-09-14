@@ -32,6 +32,7 @@ flowchart LR
         I[Dockerized Apache Airflow] -.->|Extract / Stage / Transform / Test| C
         J[GitHub Actions CI] -.->|Black / Flake8 / SQLFluff / dbt Parse| I
     end
+```
 
 ---
 
