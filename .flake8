@@ -1,6 +1,6 @@
 [flake8]
 max-line-length = 100
-extend-ignore = E203, W503
+extend-ignore = E203, E402, W503
 exclude =
     .git,
     __pycache__,
@@ -9,4 +9,5 @@ exclude =
     venv,
     target,
     logs,
-    dbt_packages
+    dbt_packages,
+    dbt_publisher_intel

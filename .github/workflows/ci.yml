@@ -31,13 +31,13 @@ jobs:
 
       - name: Run Flake8 Python linting
         run: |
-          flake8 src tests dags --count --max-line-length=100 --statistics
+          flake8 --config=.flake8 src tests dags --count --statistics
 
       - name: Run SQLFluff SQL linting
         run: |
           sqlfluff lint dbt_publisher_intel/models --dialect snowflake
 
-  dbt-validation:
+dbt-validation:
     name: dbt Project Validation
     runs-on: ubuntu-latest
     steps:
@@ -54,6 +54,24 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install dbt-core==1.7.9 dbt-snowflake==1.7.1
+
+      - name: Create dummy dbt profile for compilation check
+        run: |
+          mkdir -p /home/runner/.dbt
+          cat <<EOF > /home/runner/.dbt/profiles.yml
+          publisher_intel:
+            target: dev
+            outputs:
+              dev:
+                type: snowflake
+                account: dummy_account
+                user: dummy_user
+                password: dummy_password
+                role: dummy_role
+                database: dummy_db
+                warehouse: dummy_wh
+                schema: dummy_schema
+          EOF
 
       - name: Validate dbt syntax and compilation
         run: |
