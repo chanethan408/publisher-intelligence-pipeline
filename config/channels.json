@@ -3,12 +3,77 @@
     {
       "channel_id": "UC_x5XG1OV2P6uZZ5FSM9Ttw",
       "name": "Google Cloud Tech",
-      "topic": "cloud_engineering"
+      "topic": "enterprise_cloud"
+    },
+    {
+      "channel_id": "UCd6MoB9NC6uYN2grvUNT-Zg",
+      "name": "Amazon Web Services",
+      "topic": "enterprise_cloud"
+    },
+    {
+      "channel_id": "UCvA_w8t33tG51ufczQHDA4w",
+      "name": "IBM Technology",
+      "topic": "enterprise_cloud"
+    },
+    {
+      "channel_id": "UCs6nmQViDpUw0nuIx9c_WvA",
+      "name": "Microsoft Developer",
+      "topic": "enterprise_cloud"
     },
     {
       "channel_id": "UCsBjURrPoezykLs9EqgamOA",
       "name": "Fireship",
-      "topic": "software_engineering"
+      "topic": "independent_media"
+    },
+    {
+      "channel_id": "UC29ju8bIPH5as8OGnQzwJyA",
+      "name": "Traversy Media",
+      "topic": "independent_media"
+    },
+    {
+      "channel_id": "UC9-y-6csu5WGm29I7JiwpnA",
+      "name": "Computerphile",
+      "topic": "independent_media"
+    },
+    {
+      "channel_id": "UCvjgXvBlbQiydffZU7m1_aw",
+      "name": "The Coding Train",
+      "topic": "independent_media"
+    },
+    {
+      "channel_id": "UCCezIgC97PvUuR4_gbFUs5g",
+      "name": "Corey Schafer",
+      "topic": "independent_media"
+    },
+    {
+      "channel_id": "UC-Dy4Ys21G556OOu4DuGZrw",
+      "name": "ArjanCodes",
+      "topic": "independent_media"
+    },
+    {
+      "channel_id": "UCYO_jab_esuFRV4b17AJtAw",
+      "name": "3Blue1Brown",
+      "topic": "boutique_technical"
+    },
+    {
+      "channel_id": "UC9x0AN7BWHpCDHSm9NiJFJQ",
+      "name": "ByteByteGo",
+      "topic": "boutique_technical"
+    },
+    {
+      "channel_id": "UC6biysICWOJ-C3P4Tyeggzg",
+      "name": "Low Level Learning",
+      "topic": "boutique_technical"
+    },
+    {
+      "channel_id": "UCaiL2GDNpLYH6Wokkk1VNcg",
+      "name": "mCoding",
+      "topic": "boutique_technical"
+    },
+    {
+      "channel_id": "UCtYLUTtgS3k1Fg4y5tAhLgw",
+      "name": "StatQuest with Josh Starmer",
+      "topic": "boutique_technical"
     }
   ]
 }

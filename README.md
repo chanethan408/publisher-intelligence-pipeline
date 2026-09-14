@@ -19,7 +19,7 @@ flowchart LR
         A[YouTube Data API v3] -->|Python Extractor| B[(Amazon S3 Raw Lake)]
     end
 
-    subgraph Data Warehouse [Snowflake Cloud DWH]
+    subgraph DWH [Snowflake Cloud DWH]
         B -->|External Stage / COPY INTO| C[(RAW_INGEST.RAW_VIDEOS)]
         C -->|dbt View| D[STAGING.stg_youtube__videos]
         D -->|dbt View| E[INTERMEDIATE.int_daily_video_metrics]
@@ -28,8 +28,8 @@ flowchart LR
         E -->|dbt Incremental Merge| H[MARTS.FCT_DAILY_VIDEO_PERFORMANCE]
     end
 
-    subgraph Orchestration & CI [Orchestration & Verification]
-        I[Dockerized Apache Airflow] -.->|Extract >> Stage >> dbt Run >> dbt Test| Data Warehouse
+    subgraph Orchestration [Orchestration & Verification]
+        I[Dockerized Apache Airflow] -.->|Extract / Stage / Transform / Test| DWH
         J[GitHub Actions CI] -.->|Black / Flake8 / SQLFluff / dbt Parse| Orchestration
     end
 ```
@@ -47,12 +47,14 @@ Verified row counts from completed Airflow pipeline executions:
 | **Dimensional Videos** | `MARTS.DIM_VIDEOS` | **6,932** | Deduplicated video entities across all snapshot runs |
 | **Fact Snapshots** | `MARTS.FCT_DAILY_VIDEO_PERFORMANCE` | **6,931** | Daily incremental performance snapshots at `(video_id, snapshot_date)` grain |
 
+> **Note on Configuration:** The pipeline architecture is parameter-driven via `config/channels.json` and scales dynamically across publisher channels. The verified figures above represent historical pipeline runs during initial stage verification; the configuration is set to track 15 enterprise and independent tech publisher channels.
+
 ---
 
 ## Technical Highlights & Engineering Decisions
 
-* **Cloud Storage & Raw Landing:** Serializes raw API responses to gzip-compressed JSON in date-partitioned Hive paths (`s3://<bucket>/raw/entity=videos/date=YYYY-MM-DD/payload_<timestamp>.json.gz`). S3 serves as an immutable lake, preserving raw states for full auditability, replaying, and backfills without burning API quota.
-* **IAM AssumeRole Integration:** Configured a Snowflake Storage Integration via AWS IAM `sts:AssumeRole`, removing the need for static, hardcoded AWS keys in database metadata. Warehouse operations are isolated to an automated `AIRFLOW_LOAD_ROLE` and `PUBLISHER_LOADER` service user using 2048-bit RSA keypair authentication.
+* **Cloud Storage & Raw Landing:** Serializes raw API responses to gzip-compressed JSON in date-partitioned Hive paths (`s3://<bucket>/raw/entity=videos/date=YYYY-MM-DD/payload_<timestamp>.json.gz`). S3 serves as an immutable data lake, preserving raw states for full auditability, replaying, and backfills without consuming API quota.
+* **IAM AssumeRole Integration:** Configured a Snowflake Storage Integration via AWS IAM `sts:AssumeRole`, eliminating hardcoded AWS credentials in warehouse metadata. Warehouse operations are isolated to an automated `AIRFLOW_LOAD_ROLE` and `PUBLISHER_LOADER` service user authenticated via 2048-bit RSA keypair.
 * **Idempotent Ingestion & Transformation:**
   * **Physical Staging:** Relies on Snowflake load history tracking to prevent duplicate ingestion of staged files during task retries.
   * **Logical Staging:** Applies `QUALIFY ROW_NUMBER() OVER (PARTITION BY video_id, snapshot_date ORDER BY ingested_at DESC) = 1` in `stg_youtube__videos` so intraday pipeline reruns only materialize the latest payload.
@@ -137,7 +139,7 @@ publisher-intelligence-pipeline/
 
 ### 1. Repository & Virtual Environment
 ```bash
-git clone [https://github.com/chanethan408/publisher-intelligence-pipeline.git](https://github.com/chanethan408/publisher-intelligence-pipeline.git)
+git clone https://github.com/chanethan408/publisher-intelligence-pipeline.git
 cd publisher-intelligence-pipeline
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
