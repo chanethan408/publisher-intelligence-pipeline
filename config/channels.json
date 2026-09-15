@@ -2,8 +2,8 @@
   "channels": [
     {
       "channel_id": "UC_x5XG1OV2P6uZZ5FSM9Ttw",
-      "name": "Google Cloud Tech",
-      "topic": "enterprise_cloud"
+	  "name": "Google for Developers",
+	  "topic": "enterprise_cloud"
     },
     {
       "channel_id": "UCd6MoB9NC6uYN2grvUNT-Zg",
@@ -11,12 +11,12 @@
       "topic": "enterprise_cloud"
     },
     {
-      "channel_id": "UCvA_w8t33tG51ufczQHDA4w",
-      "name": "IBM Technology",
-      "topic": "enterprise_cloud"
+      "channel_id": "UC7cs8q-gJRlGwj4A8OmCmXg",
+      "name": "Alex The Analyst",
+      "topic": "boutique_technical"
     },
     {
-      "channel_id": "UCs6nmQViDpUw0nuIx9c_WvA",
+      "channel_id": "UCsMica-v34Irf9KVTh6xx-g",
       "name": "Microsoft Developer",
       "topic": "enterprise_cloud"
     },
@@ -46,7 +46,7 @@
       "topic": "independent_media"
     },
     {
-      "channel_id": "UC-Dy4Ys21G556OOu4DuGZrw",
+      "channel_id": "UCVhQ2NnY5Rskt6UjCUkJ_DA",
       "name": "ArjanCodes",
       "topic": "independent_media"
     },
@@ -56,13 +56,13 @@
       "topic": "boutique_technical"
     },
     {
-      "channel_id": "UC9x0AN7BWHpCDHSm9NiJFJQ",
+      "channel_id": "UCZgt6AzoyjslHTC9dz0UoTw",
       "name": "ByteByteGo",
       "topic": "boutique_technical"
     },
     {
       "channel_id": "UC6biysICWOJ-C3P4Tyeggzg",
-      "name": "Low Level Learning",
+      "name": "Low Level TV",
       "topic": "boutique_technical"
     },
     {
@@ -71,7 +71,7 @@
       "topic": "boutique_technical"
     },
     {
-      "channel_id": "UCtYLUTtgS3k1Fg4y5tAhLgw",
+      "channel_id": "UCtYLUTtgS3k1Fg4y5tAhLbw",
       "name": "StatQuest with Josh Starmer",
       "topic": "boutique_technical"
     }

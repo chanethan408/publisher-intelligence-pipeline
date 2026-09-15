@@ -78,14 +78,13 @@ class SnowflakeStageLoader:
         FROM (
             SELECT
                 $1 AS raw_payload,
-                TO_DATE(REGEXP_SUBSTR(METADATA$FILENAME,
-                'date=([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})', 1, 1, 'e', 1)) AS execution_date,
+                TO_DATE(REGEXP_SUBSTR(METADATA$FILENAME, 'date=([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})', 1, 1, 'e', 1)) AS execution_date,
                 CURRENT_TIMESTAMP() AS ingested_at,
                 METADATA$FILENAME AS source_file
-            FROM @PUBLISHER_DWH.RAW_INGEST.STAGE_S3_RAW
+            FROM @PUBLISHER_DWH.RAW_INGEST.STAGE_S3_RAW/entity=videos/date={execution_date}/
         )
-        PATTERN = '.*date={execution_date}/.*\\.json\\.gz'
         FILE_FORMAT = (FORMAT_NAME = 'PUBLISHER_DWH.RAW_INGEST.FF_JSON_GZIP')
+        FORCE = TRUE
         ON_ERROR = 'ABORT_STATEMENT';
         """
 
@@ -100,10 +99,11 @@ class SnowflakeStageLoader:
                     cur.execute(pattern_sql)
                     results = cur.fetchall()
 
+                    # Transformed COPY INTO returns: [file, status, rows_parsed, rows_loaded, ...]
                     rows_loaded = sum(
-                        row[1]
+                        row[3]
                         for row in results
-                        if len(row) > 1 and isinstance(row[1], int)
+                        if len(row) > 3 and isinstance(row[3], int)
                     )
                     files_loaded = len(results)
 
