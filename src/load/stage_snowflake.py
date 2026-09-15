@@ -78,7 +78,16 @@ class SnowflakeStageLoader:
         FROM (
             SELECT
                 $1 AS raw_payload,
-                TO_DATE(REGEXP_SUBSTR(METADATA$FILENAME, 'date=([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})', 1, 1, 'e', 1)) AS execution_date,
+                TO_DATE(
+                    REGEXP_SUBSTR(
+                        METADATA$FILENAME,
+                        'date=([0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})',
+                        1,
+                        1,
+                        'e',
+                        1,
+                    )
+                ) AS execution_date,
                 CURRENT_TIMESTAMP() AS ingested_at,
                 METADATA$FILENAME AS source_file
             FROM @PUBLISHER_DWH.RAW_INGEST.STAGE_S3_RAW/entity=videos/date={execution_date}/
